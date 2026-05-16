@@ -148,11 +148,11 @@ body {
 }
 
 .menu-card {
-  margin: 0 12px 8px;
+  margin: 0 12px 10px;
   background: var(--ivory);
   border: 1px solid var(--cream-bd);
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
   overflow: hidden;
@@ -162,44 +162,56 @@ body {
   border-color: var(--gold);
   box-shadow: 0 2px 12px rgba(27,58,45,0.08);
 }
+.menu-card:active { opacity: 0.85; }
 .menu-card.sold-out { opacity: 0.45; pointer-events: none; }
 
-.card-info { flex: 1; padding: 13px 12px; }
+.card-info { flex: 1; padding: 10px 12px 12px; }
 .card-name {
   font-family: 'EB Garamond', serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--text-dk);
-  line-height: 1.55;
-  margin-bottom: 5px;
+  line-height: 1.5;
+  margin-bottom: 4px;
   letter-spacing: 0.01em;
 }
 .card-price {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 12px;
+  font-size: 13px;
   font-style: italic;
   color: var(--gold);
   letter-spacing: 0.04em;
 }
 .card-img {
-  width: 90px;
-  min-width: 90px;
-  height: 80px;
+  width: 100%;
+  height: 110px;
   background: var(--cream-dk);
-  border-left: 1px solid var(--cream-bd);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 36px;
   flex-shrink: 0;
+  border-bottom: 1px solid var(--cream-bd);
 }
 .card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s;
+  transition: transform 0.3s ease;
+}
+.menu-card:hover .card-img img { transform: scale(1.04); }
+
+/* カードをグリッドで2列表示 */
+.menu-grid-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 10px 6px;
+}
+.menu-grid-wrap .menu-card {
+  margin: 0 6px 10px;
 }
 
 .sold-badge {
@@ -212,20 +224,23 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 3px 8px;
+  z-index: 1;
 }
 .in-cart-dot {
   position: absolute;
-  top: 8px; right: 90px;
-  width: 18px; height: 18px;
+  top: 8px; right: 8px;
+  width: 22px; height: 22px;
   border-radius: 50%;
   background: var(--green);
   color: var(--cream);
-  font-size: 10px;
+  font-size: 11px;
   font-family: 'EB Garamond', serif;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
+  z-index: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 /* ── SUBSCREENS ── */
@@ -264,23 +279,25 @@ body {
 .cart-row:last-of-type { border-bottom: none; }
 .cart-row-emoji { font-size: 18px; }
 .cart-row-name { flex: 1; font-size: 13px; color: var(--text-dk); line-height: 1.4; }
-.qty-ctrl { display: flex; align-items: center; gap: 8px; }
+.qty-ctrl { display: flex; align-items: center; gap: 4px; }
 .qty-btn {
-  width: 22px; height: 22px;
+  width: 44px; height: 44px;
   border: 1px solid var(--cream-bd);
   background: transparent;
   color: var(--text-dk);
-  font-size: 14px;
+  font-size: 20px;
   cursor: pointer;
   font-family: 'EB Garamond', serif;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
-.qty-btn:hover { border-color: var(--green); }
-.qty-num { font-size: 13px; min-width: 18px; text-align: center; color: var(--text-dk); }
+.qty-btn:hover { border-color: var(--green); background: var(--cream-dk); }
+.qty-btn:active { background: var(--cream-bd); }
+.qty-num { font-size: 14px; min-width: 24px; text-align: center; color: var(--text-dk); font-weight: 500; }
 .cart-row-price { font-size: 12px; font-style: italic; color: var(--gold); min-width: 58px; text-align: right; }
 
 .cart-total-block {
@@ -670,24 +687,25 @@ loadSharedOrders();
 function renderMenu(cat){
   const area=document.getElementById('menu-area');
   const sec=MENU_DATA[cat];
+  const cards = sec.items.map(item=>{
+    const qty=cart[item.id]||0;
+    const imgHtml = item.img
+      ? `<img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        + `<span style="display:none;align-items:center;justify-content:center;font-size:36px;width:100%;height:100%">${item.emoji}</span>`
+      : `<span>${item.emoji}</span>`;
+    return `<div class="menu-card${item.soldOut?' sold-out':''}" onclick="addToCart(${item.id})">
+      ${item.soldOut?'<span class="sold-badge">Sold Out</span>':''}
+      ${(!item.soldOut&&qty>0)?`<span class="in-cart-dot">${qty}</span>`:''}
+      <div class="card-img">${imgHtml}</div>
+      <div class="card-info">
+        <div class="card-name">${item.name}</div>
+        <div class="card-price">¥${item.price.toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
   area.innerHTML=
-    `<div class="section-hd"><div class="section-hd-label">${sec.label}</div></div>`+
-    sec.items.map(item=>{
-      const qty=cart[item.id]||0;
-      const imgHtml = item.img
-        ? `<img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-          + `<span style="display:none;align-items:center;justify-content:center;font-size:26px;width:100%;height:100%">${item.emoji}</span>`
-        : `<span>${item.emoji}</span>`;
-      return `<div class="menu-card${item.soldOut?' sold-out':''}" onclick="addToCart(${item.id})">
-        ${item.soldOut?'<span class="sold-badge">Sold Out</span>':''}
-        ${(!item.soldOut&&qty>0)?`<span class="in-cart-dot">${qty}</span>`:''}
-        <div class="card-info">
-          <div class="card-name">${item.name}</div>
-          <div class="card-price">¥${item.price.toLocaleString()}</div>
-        </div>
-        <div class="card-img">${imgHtml}</div>
-      </div>`;
-    }).join('');
+    `<div class="section-hd"><div class="section-hd-label">${sec.label}</div></div>`
+    + `<div class="menu-grid-wrap">${cards}</div>`;
 }
 
 function selectCat(cat,el){
@@ -731,8 +749,11 @@ function renderCartScreen(){
   list.innerHTML=ids.map(id=>{
     const item=allItems().find(i=>i.id==id);
     total+=item.price*cart[id];
+    const thumb = item.img
+      ? `<img src="${item.img}" alt="${item.name}" style="width:48px;height:48px;object-fit:cover;flex-shrink:0;border:1px solid var(--cream-bd);">`
+      : `<span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--cream-dk);flex-shrink:0;border:1px solid var(--cream-bd);">${item.emoji}</span>`;
     return `<div class="cart-row">
-      <span class="cart-row-emoji">${item.emoji}</span>
+      ${thumb}
       <span class="cart-row-name">${item.name}</span>
       <div class="qty-ctrl">
         <button class="qty-btn" onclick="changeQty(${id},-1)">−</button>
