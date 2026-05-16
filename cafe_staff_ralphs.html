@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ralph's Café — Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:     #1B3A2D;
+  --green-mid: #264D3B;
+  --green-lt:  #2E5E47;
+  --cream:     #F6F1E9;
+  --cream-dk:  #EDE6D8;
+  --cream-bd:  #D9D0BE;
+  --gold:      #B89A5A;
+  --gold-lt:   #D4B87A;
+  --ivory:     #FDFAF5;
+  --text-dk:   #1A1A17;
+  --text-md:   #3D3D35;
+  --text-lt:   #7A7468;
+  --red:       #8B2A2A;
+  --red-lt:    #F5EAEA;
+  --amber:     #7A5A1A;
+  --amber-lt:  #FBF5E6;
+  --sage:      #2A4A35;
+  --sage-lt:   #EBF2EC;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: var(--green);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: var(--green);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  padding: 0 32px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.brand-wrap { display: flex; align-items: baseline; gap: 16px; }
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.brand em { font-style: italic; color: var(--gold-lt); letter-spacing: 0.12em; }
+.screen-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(246,241,233,0.45);
+}
+.top-right { display: flex; align-items: center; gap: 24px; }
+.clock {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--gold-lt);
+  letter-spacing: 0.06em;
+}
+.date-str {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(246,241,233,0.45);
+  text-transform: uppercase;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  background: var(--cream-dk);
+  border-bottom: 1px solid var(--cream-bd);
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-shrink: 0;
+}
+.stat-item { display: flex; align-items: baseline; gap: 8px; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--green);
+  letter-spacing: 0.04em;
+}
+.stat-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-lt);
+}
+.stat-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--cream-bd);
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+  background: var(--cream);
+}
+
+/* ── KANBAN ── */
+.kanban-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.kanban-col {}
+
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cream-bd);
+}
+.col-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--green);
+  letter-spacing: 0.04em;
+}
+.col-count {
+  font-family: 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-lt);
+  border: 1px solid var(--cream-bd);
+  padding: 2px 8px;
+}
+
+/* ── ORDER CARD ── */
+.order-card {
+  background: var(--ivory);
+  border: 1px solid var(--cream-bd);
+  margin-bottom: 12px;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+.order-card:hover { box-shadow: 0 3px 16px rgba(27,58,45,0.10); }
+
+.card-accent {
+  height: 3px;
+  background: var(--cream-bd);
+}
+.card-accent.urgent { background: var(--red); }
+.card-accent.normal { background: var(--gold); }
+.card-accent.ready  { background: var(--green); }
+
+.card-body { padding: 14px 16px; }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.order-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--green);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.order-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.table-tag {
+  font-family: 'EB Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 2px 8px;
+}
+.time-tag {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-lt);
+}
+.time-tag.urgent { color: var(--red); font-style: normal; font-weight: 500; }
+
+.divider-ornament {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.divider-ornament::before,
+.divider-ornament::after { content:''; flex:1; height:0.5px; background: var(--cream-dk); }
+.divider-ornament span { font-size: 8px; color: var(--gold); letter-spacing: 0.2em; }
+
+.items-list { list-style: none; margin-bottom: 14px; }
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 0.5px solid var(--cream-dk);
+  font-family: 'EB Garamond', serif;
+}
+.item-row:last-child { border-bottom: none; }
+.item-emoji { font-size: 15px; }
+.item-name { flex: 1; font-size: 13px; color: var(--text-dk); line-height: 1.4; }
+.item-qty {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--gold);
+  min-width: 28px;
+  text-align: right;
+}
+.item-check {
+  width: 16px; height: 16px;
+  border: 1px solid var(--cream-bd);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.item-check.checked { background: var(--green); border-color: var(--green); }
+.item-check.checked::after { content: '✓'; font-size: 10px; color: var(--cream); }
+
+.action-btn {
+  width: 100%;
+  padding: 10px;
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-prepare {
+  background: var(--green);
+  color: var(--cream);
+  border: none;
+}
+.btn-prepare:hover { background: var(--green-lt); }
+.btn-ready {
+  background: transparent;
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+.btn-ready:hover { background: var(--green); color: var(--cream); }
+.btn-serve {
+  background: transparent;
+  color: var(--text-lt);
+  border: 1px solid var(--cream-bd);
+}
+.btn-serve:hover { border-color: var(--text-md); color: var(--text-md); }
+
+.col-empty {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text-lt);
+  padding: 24px 0;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* ── DEMO CONTROL ── */
+.demo-bar {
+  background: var(--green-mid);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.demo-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(246,241,233,0.45);
+}
+.demo-btn {
+  font-family: 'EB Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  background: transparent;
+  border: 1px solid rgba(212,184,122,0.4);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.demo-btn:hover { border-color: var(--gold-lt); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--green);
+  color: var(--cream);
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  border: 1px solid var(--gold);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="brand-wrap">
+    <div class="brand">Ralph's <em>Café</em></div>
+    <span class="screen-label">— Kitchen Display</span>
+  </div>
+  <div class="top-right">
+    <span class="date-str" id="date-str"></span>
+    <span class="clock" id="clock"></span>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num" id="stat-received">0</span>
+    <span class="stat-label">Received</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-num" id="stat-preparing">0</span>
+    <span class="stat-label">Preparing</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-num" id="stat-ready">0</span>
+    <span class="stat-label">Ready</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-item">
+    <span class="stat-num" id="stat-total">0</span>
+    <span class="stat-label">Today's Orders</span>
+  </div>
+</div>
+
+<!-- MAIN KANBAN -->
+<div class="main">
+  <div class="kanban-grid">
+    <div class="kanban-col" id="col-received">
+      <div class="col-header">
+        <span class="col-title">Received</span>
+        <span class="col-count" id="count-received">0 orders</span>
+      </div>
+      <div id="cards-received"></div>
+    </div>
+    <div class="kanban-col" id="col-preparing">
+      <div class="col-header">
+        <span class="col-title">Preparing</span>
+        <span class="col-count" id="count-preparing">0 orders</span>
+      </div>
+      <div id="cards-preparing"></div>
+    </div>
+    <div class="kanban-col" id="col-ready">
+      <div class="col-header">
+        <span class="col-title">Ready to Serve</span>
+        <span class="col-count" id="count-ready">0 orders</span>
+      </div>
+      <div id="cards-ready"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'ralphs_orders';
+const COUNTER_KEY = 'ralphs_counter';
+
+let orders = [];
+let totalServed = 0;
+let checkedItems = {};
+
+function loadOrders(){
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : [];
+    // timeをnumber(ms)に統一
+    orders = parsed.map(o => ({
+      ...o,
+      time: typeof o.time === 'string' ? new Date(o.time).getTime() : o.time
+    }));
+    // checkedItemsにないキーを初期化
+    orders.forEach(o => {
+      if(!checkedItems[o.num]) checkedItems[o.num] = new Set();
+    });
+  } catch(e){ orders = []; }
+}
+
+function saveOrders(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  } catch(e){}
+}
+
+// 顧客画面から注文が来たらリアルタイムで反映
+window.addEventListener('storage', (e) => {
+  if(e.key === STORAGE_KEY){
+    const prevNums = new Set(orders.map(o=>o.num));
+    loadOrders();
+    // 新着注文を検知してトーストで通知
+    orders.forEach(o => {
+      if(!prevNums.has(o.num) && o.status === 'received'){
+        showToast('New order #' + o.num + ' — ' + o.table + ' received');
+      }
+    });
+    render();
+  }
+});
+
+function minutesAgo(t) {
+  return Math.floor((Date.now() - t) / 60000);
+}
+
+function isUrgent(t) {
+  return minutesAgo(t) >= 8;
+}
+
+function advance(num) {
+  const o = orders.find(x => x.num === num);
+  if (!o) return;
+  const next = { received:'preparing', preparing:'ready', ready:'done' };
+  const msgs = {
+    received: 'Order #' + num + ' — Now preparing',
+    preparing: 'Order #' + num + ' — Ready to serve',
+    ready:     'Order #' + num + ' — Served. Thank you!'
+  };
+  showToast(msgs[o.status]);
+  o.status = next[o.status];
+  if (o.status === 'done') {
+    totalServed++;
+    orders = orders.filter(x => x.num !== num);
+    delete checkedItems[num];
+  }
+  saveOrders();
+  render();
+}
+
+function toggleCheck(num, idx) {
+  if (!checkedItems[num]) checkedItems[num] = new Set();
+  if (checkedItems[num].has(idx)) checkedItems[num].delete(idx);
+  else checkedItems[num].add(idx);
+  render();
+}
+
+function buildCard(o) {
+  const mins = minutesAgo(o.time);
+  const urgent = isUrgent(o.time);
+  const accentClass = o.status === 'ready' ? 'ready' : (urgent ? 'urgent' : 'normal');
+  const btnMap = {
+    received: `<button class="action-btn btn-prepare" onclick="advance('${o.num}')">Start Preparing</button>`,
+    preparing:`<button class="action-btn btn-ready"   onclick="advance('${o.num}')">Mark as Ready</button>`,
+    ready:    `<button class="action-btn btn-serve"   onclick="advance('${o.num}')">Served — Complete</button>`,
+  };
+  const timeStr = mins === 0 ? 'Just now' : mins + ' min ago';
+  const checked = checkedItems[o.num] || new Set();
+
+  return `
+    <div class="order-card" id="card-${o.num}">
+      <div class="card-accent ${accentClass}"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="order-num">#${o.num}</span>
+          <div class="order-meta">
+            <span class="table-tag">${o.table || 'T—'}</span>
+            <span class="time-tag${urgent?' urgent':''}">${urgent?'⚠ ':''}${timeStr}</span>
+          </div>
+        </div>
+        <div class="divider-ornament"><span>✦</span></div>
+        <ul class="items-list">
+          ${o.items.map((item, idx) => `
+            <li class="item-row">
+              <span class="item-emoji">${item.emoji}</span>
+              <span class="item-name" style="${checked.has(idx)?'text-decoration:line-through;color:var(--text-lt)':''}">${item.name}</span>
+              <span class="item-qty">×${item.qty}</span>
+              <div class="item-check ${checked.has(idx)?'checked':''}" onclick="toggleCheck('${o.num}',${idx})"></div>
+            </li>`).join('')}
+        </ul>
+        ${btnMap[o.status]}
+      </div>
+    </div>`;
+}
+
+function render() {
+  const statuses = ['received','preparing','ready'];
+  statuses.forEach(s => {
+    const filtered = orders.filter(o => o.status === s);
+    const container = document.getElementById('cards-' + s);
+    const count = document.getElementById('count-' + s);
+    const stat = document.getElementById('stat-' + s);
+    count.textContent = filtered.length + (filtered.length === 1 ? ' order' : ' orders');
+    stat.textContent = filtered.length;
+    container.innerHTML = filtered.length
+      ? filtered.map(buildCard).join('')
+      : `<div class="col-empty">No orders</div>`;
+  });
+  document.getElementById('stat-total').textContent = orders.length + totalServed;
+}
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = h + ':' + m + ':' + s;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date-str').textContent =
+    days[now.getDay()] + ' ' + months[now.getMonth()] + ' ' + now.getDate();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// 初期ロード
+loadOrders();
+render();
+updateClock();
+setInterval(updateClock, 1000);
+setInterval(() => { loadOrders(); render(); }, 3000); // 3秒ごとにポーリング（同一タブ対策）
+</script>
+</body>
+</html>
